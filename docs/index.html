@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tamarack Build Co. — project budget &amp; payment tracker (concept demo)</title>
+  <meta name="description" content="Concept demo of a project budget and payment tracker for Tamarack Build Co., a fictional home builder: budget vs paid by category, a filterable payments log, change orders and missing-receipt flags, with a matching Excel workbook. Example data only. Built by Alex Mercer.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f3f1ea">
+  <meta property="og:title" content="Tamarack Build Co. budget &amp; payment tracker — concept demo">
+  <meta property="og:description" content="A budget and payment tracker for a made-up home builder, as a live dashboard and a real .xlsx. Every number is example data.">
+  <meta property="og:type" content="website">
+  <link rel="preload" href="fonts/Geist.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/GeistMono.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e5a44'/%3E%3Cpath d='M16 5l7 10h-4l6 8H7l6-8H9z' fill='%23f3f1ea'/%3E%3Crect x='14.6' y='23' width='2.8' height='4' fill='%23f3f1ea'/%3E%3C/svg%3E">
+  <script>if(!/[?&]static\b/.test(location.search)&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('anim');</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="demo-bar" role="note">
+    <p><b>Concept demo by Alex Mercer.</b> Made-up builder and project; every name, invoice and dollar amount is example data.</p>
+  </div>
+
+  <header class="top">
+    <div class="wrap top__inner">
+      <a class="logo" href="#main" aria-label="Tamarack Build Co., project tracker">
+        <svg class="logo__mark" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="currentColor"/><path d="M20 6.5l8.5 12h-4.6l7.1 9.5H9l7.1-9.5h-4.6z" fill="#f3f1ea"/><rect x="18.3" y="28" width="3.4" height="5.5" fill="#f3f1ea"/></svg>
+        <span class="logo__word"><span>Tamarack Build Co.</span><small>Project tracker</small></span>
+      </a>
+      <nav class="top__nav" aria-label="Sections">
+        <a href="#budget">Budget</a>
+        <a href="#payments">Payments</a>
+        <a href="#changes">Change orders</a>
+        <a href="#sheet">Spreadsheet</a>
+      </nav>
+      <a class="btn btn--dl top__dl" href="Tamarack-budget-tracker-DEMO.xlsx" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Download .xlsx</span></a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-h">
+      <div class="wrap">
+        <div class="hero__head">
+          <div>
+            <p class="eyebrow">Project budget &amp; payment tracker</p>
+            <h1 id="hero-h">Where every dollar on the build <em>went.</em></h1>
+            <p class="hero__lede">Budget against paid for each trade, every payment with its receipt status, and the change orders that moved the numbers. Click a category to see its payments.</p>
+          </div>
+          <dl class="proj" aria-label="Project">
+            <div><dt>Project</dt><dd id="p-name">Example new build</dd></div>
+            <div><dt>Site</dt><dd id="p-addr">00 Example Lane</dd></div>
+            <div><dt>Numbers as of</dt><dd id="p-asof">Nov 16, 2026</dd></div>
+            <div class="proj__stamp"><span class="stamp">Example data</span></div>
+          </dl>
+        </div>
+
+        <div class="kpis" id="kpis" aria-label="Totals, calculated from the example data">
+          <div class="kpi kpi--lead">
+            <p class="kpi__k">Remaining balance</p>
+            <p class="kpi__v" data-k="remaining">$0</p>
+            <p class="kpi__s" data-k="remainingSub"></p>
+          </div>
+          <div class="kpi">
+            <p class="kpi__k">Revised budget</p>
+            <p class="kpi__v" data-k="revised">$0</p>
+            <p class="kpi__s" data-k="revisedSub"></p>
+          </div>
+          <div class="kpi">
+            <p class="kpi__k">Paid to date</p>
+            <p class="kpi__v" data-k="paid">$0</p>
+            <p class="kpi__s" data-k="paidSub"></p>
+          </div>
+          <div class="kpi">
+            <p class="kpi__k">Pending change orders</p>
+            <p class="kpi__v" data-k="pending">$0</p>
+            <p class="kpi__s" data-k="pendingSub"></p>
+          </div>
+          <div class="kpi kpi--warn">
+            <p class="kpi__k">Missing receipts</p>
+            <p class="kpi__v" data-k="missing">0</p>
+            <p class="kpi__s" data-k="missingSub"></p>
+          </div>
+        </div>
+
+        <div class="meter rv" aria-label="Share of the revised budget paid so far">
+          <div class="meter__bar" id="meter-bar"></div>
+          <div class="meter__legend" id="meter-legend"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="budget" aria-labelledby="budget-h">
+      <div class="wrap">
+        <div class="sec__head">
+          <div>
+            <p class="eyebrow">Budget vs paid</p>
+            <h2 id="budget-h">By category</h2>
+          </div>
+          <div class="seg" role="group" aria-label="Sort categories">
+            <button type="button" class="seg__b is-on" data-sort="order" aria-pressed="true">Build order</button>
+            <button type="button" class="seg__b" data-sort="pct" aria-pressed="false">% spent</button>
+            <button type="button" class="seg__b" data-sort="left" aria-pressed="false">Most left</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cats__head" aria-hidden="true">
+            <span>Category</span><span>Paid of revised budget</span><span class="r">Paid</span><span class="r">Remaining</span>
+          </div>
+          <ol class="cats" id="cats"></ol>
+          <div class="cats__foot" id="cats-foot"></div>
+        </div>
+        <p class="note">Revised budget = original budget + approved change orders. Pending change orders are not counted until approved. <span class="tag">Example data</span></p>
+      </div>
+    </section>
+
+    <section class="sec" id="payments" aria-labelledby="pay-h">
+      <div class="wrap">
+        <div class="sec__head">
+          <div>
+            <p class="eyebrow">Payments log</p>
+            <h2 id="pay-h">Every payment, with its receipt</h2>
+          </div>
+        </div>
+        <div class="card card--flush">
+          <form class="filters" id="filters" onsubmit="return false" aria-label="Filter payments">
+            <label class="fld fld--grow"><span>Search</span><input type="search" id="f-q" placeholder="Vendor, invoice or note" autocomplete="off"></label>
+            <label class="fld"><span>Category</span><select id="f-cat"><option value="">All categories</option></select></label>
+            <label class="fld"><span>Method</span><select id="f-method"><option value="">Any method</option></select></label>
+            <label class="fld"><span>Paid from</span><select id="f-src"><option value="">Any source</option></select></label>
+            <div class="fld fld--chips"><span>Receipt</span>
+              <div class="seg seg--sm" role="group" aria-label="Receipt status">
+                <button type="button" class="seg__b is-on" data-rec="" aria-pressed="true">All</button>
+                <button type="button" class="seg__b" data-rec="No" aria-pressed="false">Missing</button>
+              </div>
+            </div>
+          </form>
+          <div class="paybar">
+            <p id="pay-count" aria-live="polite"></p>
+            <button type="button" class="linkbtn" id="f-clear" hidden>Clear filters</button>
+          </div>
+          <div class="tbl-wrap">
+            <table class="pay" id="pay">
+              <caption class="sr">Payments log, example data</caption>
+              <thead><tr><th scope="col">Date</th><th scope="col">Paid to</th><th scope="col">Category</th><th scope="col">Method</th><th scope="col">Paid from</th><th scope="col" class="r">Amount</th><th scope="col">Receipt</th></tr></thead>
+              <tbody id="pay-body"></tbody>
+              <tfoot><tr><td colspan="5" id="pay-tlabel">Total</td><td class="r" id="pay-total">$0</td><td></td></tr></tfoot>
+            </table>
+          </div>
+          <div class="more" id="pay-more-wrap" hidden><button type="button" class="more__b" id="pay-more"></button></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="changes" aria-labelledby="co-h">
+      <div class="wrap split">
+        <div>
+          <div class="sec__head">
+            <div>
+              <p class="eyebrow">Change orders</p>
+              <h2 id="co-h">What changed, and who signed</h2>
+            </div>
+          </div>
+          <div class="co-sum" id="co-sum"></div>
+          <ol class="cos" id="cos"></ol>
+        </div>
+        <aside class="attn" aria-labelledby="attn-h">
+          <div class="attn__in">
+            <p class="eyebrow">Needs attention</p>
+            <h2 id="attn-h">Before the next draw</h2>
+            <ul class="attn__list" id="attn"></ul>
+          </div>
+          <div class="months">
+            <p class="months__h">Paid by month</p>
+            <div class="months__chart" id="months"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="sec sec--sheet" id="sheet" aria-labelledby="sheet-h">
+      <div class="wrap">
+        <div class="sheet__grid">
+          <div class="sheet__copy rv">
+            <p class="eyebrow">The spreadsheet</p>
+            <h2 id="sheet-h">Same numbers, in a real workbook.</h2>
+            <p>The dashboard reads from the same example data as the Excel file. In the workbook, you type the budget once and log payments as they go out. The rollups are plain formulas, so nothing breaks when a row is added.</p>
+            <a class="btn btn--dl btn--lg" href="Tamarack-budget-tracker-DEMO.xlsx" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Download the .xlsx</span></a>
+            <p class="sheet__fine">Tamarack-budget-tracker-DEMO.xlsx · 5 tabs · opens in Excel, Google Sheets or Numbers. Example data.</p>
+          </div>
+          <ol class="tabs">
+            <li class="rv"><b>Budget vs Paid</b><p>Original budget, approved change orders, paid, remaining and % spent per category. Over-budget rows turn red; a status column says Watch at 90%.</p><code>=SUMIFS(Payments!F:F, Payments!C:C, A5)</code></li>
+            <li class="rv"><b>Payments</b><p>Date, vendor, category, draw, invoice, amount, method, source, receipt. Dropdowns on category, method, source and receipt. No receipt turns the row red and flags it.</p><code>=IF(I5&lt;&gt;"Yes", "MISSING RECEIPT", "")</code></li>
+            <li class="rv"><b>Change Orders</b><p>Approved, pending or declined, signed or not. Only approved ones change the budget; approved but unsigned ones get flagged.</p><code>=SUMIFS(…Amount, …Category, A5, …Status, "Approved")</code></li>
+            <li class="rv"><b>Read Me + Lists</b><p>How to start with your own numbers, and the dropdown choices in one place. Categories come straight from the budget tab.</p><code>CategoryList → 'Budget vs Paid'!A5:A19</code></li>
+          </ol>
+        </div>
+        <figure class="wb rv">
+          <div class="wb__chrome" aria-hidden="true"><i></i><i></i><i></i><span>Tamarack-budget-tracker-DEMO.xlsx</span></div>
+          <div class="wb__scroll" tabindex="0" aria-label="Workbook preview, scrolls sideways on small screens">
+            <img src="img/budget-vs-paid-tab.webp" width="1600" height="1050" alt="The Budget vs Paid tab of the workbook: 15 categories with original budget, approved change orders, revised budget, paid to date, remaining, percent spent, missing receipts and status, then an At a glance block. Site Work and Utilities is highlighted red as over budget.">
+          </div>
+          <div class="wb__tabs" aria-hidden="true"><span>Read Me</span><span class="is-on">Budget vs Paid</span><span>Payments</span><span>Change Orders</span><span>Lists</span></div>
+          <figcaption>The Budget vs Paid tab of the actual .xlsx, opened in a spreadsheet app. Every number comes from formulas over the example payments and change orders.</figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot__inner">
+      <span class="foot__mark">Tamarack Build Co.</span>
+      <span>Concept demo by <a href="https://github.com/alexmercer-projects">Alex Mercer</a>. Made-up builder; every name, invoice and amount is example data.</span>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
